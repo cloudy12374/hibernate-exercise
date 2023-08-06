@@ -1,7 +1,14 @@
 package app;
+import java.util.List;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Root;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.CriteriaQuery;
+import org.hibernate.query.Query;
 
 import core.util.HibernateUtil;
 import web.member.pojo.Member;
@@ -9,8 +16,8 @@ import web.member.pojo.Member;
 public class Testapp {
 	
 	public static void main(String[] args) {
-		Testapp testapp = new Testapp();
-		Member member = new Member();
+//		Testapp testapp = new Testapp();
+//		Member member = new Member();
 		
 //		member.setUsername("小豬佩奇");
 //		member.setPassword("9487");
@@ -27,7 +34,31 @@ public class Testapp {
 //		newMember.setRoleId(1);
 //		System.out.println(testapp.updateById(newMember));
 		
-		System.out.println(testapp.selectById(4).getNickname());
+//		System.out.println(testapp.selectById(4).getNickname());
+//		System.out.println(testapp.selectAll());
+//		testapp.selectAll().forEach(member -> System.out.println(member.getNickname()));
+//		testapp.selectAll().forEach(member -> System.out.println(member.getUsername()));
+		
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory(); //Datasource
+		Session session = sessionFactory.openSession(); //con
+		// select USERNAME, NICKNAME
+		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+		javax.persistence.criteria.CriteriaQuery<Member> criteriaQuery = criteriaBuilder.createQuery(Member.class);
+		//from Member
+		Root<Member> root = criteriaQuery.from(Member.class);
+		//where USENSME = ? and PASSWORD = ?
+		criteriaQuery.where(criteriaBuilder.and(
+				criteriaBuilder.equal(root.get("username"), "admin"),
+				criteriaBuilder.equal(root.get("password"),"P@ssw0rd")));
+		
+		//select USERNAME,NICKNAME
+		criteriaQuery.multiselect(root.get("username"), root.get("nickname"));
+		//order by ID
+		criteriaQuery.orderBy(criteriaBuilder.asc(root.get("id")));
+		
+		Member member = session.createQuery(criteriaQuery).uniqueResult();
+		System.out.println(member.getNickname());
+		
 	}
 	
 	public Integer insert(Member member) {
@@ -93,6 +124,23 @@ public class Testapp {
 			Member member = session.get(Member.class, id);
 			transaction.commit();
 			return member;
+		} catch (Exception e) {
+			// TODO: handle exception
+			session.getTransaction().rollback();
+		}
+		return null;
+	}
+	
+	public List<Member> selectAll() {
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory(); //Datasource
+		Session session = sessionFactory.openSession(); //con
+		try {
+			Transaction transaction= session.beginTransaction();
+			Query<Member> query = session.createQuery(""
+					+ "SELECT new web.member.pojo.Member(username, nickname) FROM Member", Member.class);
+			List<Member> List = query.getResultList();
+			transaction.commit();
+			return List;
 		} catch (Exception e) {
 			// TODO: handle exception
 			session.getTransaction().rollback();
