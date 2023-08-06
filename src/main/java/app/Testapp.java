@@ -11,7 +11,9 @@ import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.query.Query;
 
 import core.util.HibernateUtil;
-import web.member.pojo.Member;
+import web.emp.entity.Dept;
+import web.emp.entity.Emp;
+import web.member.entity.Member;
 
 public class Testapp {
 	
@@ -41,24 +43,35 @@ public class Testapp {
 		
 		SessionFactory sessionFactory = HibernateUtil.getSessionFactory(); //Datasource
 		Session session = sessionFactory.openSession(); //con
-		// select USERNAME, NICKNAME
-		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-		javax.persistence.criteria.CriteriaQuery<Member> criteriaQuery = criteriaBuilder.createQuery(Member.class);
-		//from Member
-		Root<Member> root = criteriaQuery.from(Member.class);
-		//where USENSME = ? and PASSWORD = ?
-		criteriaQuery.where(criteriaBuilder.and(
-				criteriaBuilder.equal(root.get("username"), "admin"),
-				criteriaBuilder.equal(root.get("password"),"P@ssw0rd")));
+//			// select USERNAME, NICKNAME
+//			CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+//			javax.persistence.criteria.CriteriaQuery<Member> criteriaQuery = criteriaBuilder.createQuery(Member.class);
+//			//from Member
+//			Root<Member> root = criteriaQuery.from(Member.class);
+//			//where USENSME = ? and PASSWORD = ?
+//			criteriaQuery.where(criteriaBuilder.and(
+//					criteriaBuilder.equal(root.get("username"), "admin"),
+//					criteriaBuilder.equal(root.get("password"),"P@ssw0rd")));
+//			
+//			//select USERNAME,NICKNAME
+//			criteriaQuery.multiselect(root.get("username"), root.get("nickname"));
+//			//order by ID
+//			criteriaQuery.orderBy(criteriaBuilder.asc(root.get("id")));
+//			
+//			Member member = session.createQuery(criteriaQuery).uniqueResult();
+//			System.out.println(member.getNickname());
 		
-		//select USERNAME,NICKNAME
-		criteriaQuery.multiselect(root.get("username"), root.get("nickname"));
-		//order by ID
-		criteriaQuery.orderBy(criteriaBuilder.asc(root.get("id")));
-		
-		Member member = session.createQuery(criteriaQuery).uniqueResult();
-		System.out.println(member.getNickname());
-		
+//		Dept dept = session.get(Dept.class, 30);
+//		var emps = dept.getEmps();
+//		for(var emp : emps) {
+//			System.out.println(emp.getEname());
+//		}
+		Emp emp = session.get(Emp.class, 7369);
+		Dept dept = emp.getDept();
+		List<Emp> emps = dept.getEmps();
+		for(Emp tmp : emps) {
+			System.out.println(tmp.getEname());
+		}
 	}
 	
 	public Integer insert(Member member) {
