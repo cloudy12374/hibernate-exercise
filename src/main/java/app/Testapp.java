@@ -1,18 +1,28 @@
 package app;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Root;
+import javax.sql.DataSource;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 
 import core.util.HibernateUtil;
 import web.emp.entity.Dept;
 import web.emp.entity.Emp;
+import web.member.dao.MemberDao;
 import web.member.entity.Member;
 
 public class Testapp {
@@ -41,8 +51,6 @@ public class Testapp {
 //		testapp.selectAll().forEach(member -> System.out.println(member.getNickname()));
 //		testapp.selectAll().forEach(member -> System.out.println(member.getUsername()));
 		
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory(); //Datasource
-		Session session = sessionFactory.openSession(); //con
 //			// select USERNAME, NICKNAME
 //			CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
 //			javax.persistence.criteria.CriteriaQuery<Member> criteriaQuery = criteriaBuilder.createQuery(Member.class);
@@ -66,12 +74,43 @@ public class Testapp {
 //		for(var emp : emps) {
 //			System.out.println(emp.getEname());
 //		}
-		Emp emp = session.get(Emp.class, 7369);
-		Dept dept = emp.getDept();
-		List<Emp> emps = dept.getEmps();
-		for(Emp tmp : emps) {
-			System.out.println(tmp.getEname());
-		}
+		
+//		SessionFactory sessionFactory = HibernateUtil.getSessionFactory(); //Datasource
+//		Session session = sessionFactory.openSession(); //con
+//		Emp emp = session.get(Emp.class, 7369);
+//		Dept dept = emp.getDept();
+//		List<Emp> emps = dept.getEmps();
+//		for(Emp tmp : emps) {
+//			System.out.println(tmp.getEname());
+//		}
+		
+		//----------以下為Spring課程-------
+//		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+//		DataSource dataSource = applicationContext.getBean(DataSource.class);
+//		
+//		try (
+//				Connection conn = dataSource.getConnection();
+//				PreparedStatement pstmt = conn.prepareStatement("select * from MEMBER where ID = ?");
+//				){
+//			pstmt.setInt(1, 2);
+//			try(ResultSet rs = pstmt.executeQuery()){
+//				if(rs.next()) {
+//					System.out.println(rs.getString("NICKNAME"));
+//				}			
+//			}
+//		} catch (Exception e) {
+//			// TODO: handle exception
+//			e.printStackTrace();
+//		}
+		GenericApplicationContext applicationContext = new GenericApplicationContext();
+        new XmlBeanDefinitionReader(applicationContext).loadBeanDefinitions("applicationContext.xml");
+        applicationContext.refresh();
+            
+        MemberDao memberDao = applicationContext.getBean(MemberDao.class);
+        System.out.println(memberDao.selectById(6).getNickname());
+        ((ConfigurableApplicationContext) applicationContext).close();
+		
+		
 	}
 	
 	public Integer insert(Member member) {

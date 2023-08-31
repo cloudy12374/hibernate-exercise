@@ -6,19 +6,19 @@ import static core.util.HibernateUtil.getSessionFactory;
 
 public interface CoreService {
 
-	private Session getSession() {
-		return getSessionFactory().getCurrentSession();
-	}
-	
-	default Transaction beginTransaction() {
-		return getSessionFactory().getCurrentSession().beginTransaction();
-	}
-	
-	default void commit() {
-		getSession().getTransaction().commit();
-	}
-	
-	default void rollback() {
-		getSession().getTransaction().rollback();;
-	}
+//	private Session getSession() {
+//		return getSessionFactory().getCurrentSession();
+//	}
+//	
+//	default Transaction beginTransaction() {
+//		return getSessionFactory().getCurrentSession().beginTransaction();
+//	}
+//	
+//	default void commit() {
+//		getSession().getTransaction().commit();
+//	}
+//	
+//	default void rollback() {
+//		getSession().getTransaction().rollback();;
+//	}
 }
